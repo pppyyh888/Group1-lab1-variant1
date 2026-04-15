@@ -57,4 +57,3 @@ implementation, `remove` deletes an element by index.
 
 Two lists are considered equal if they contain the same values in the same
 order. Internal chunk layout is treated as an implementation detail.
-
