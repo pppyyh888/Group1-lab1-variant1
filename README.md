@@ -38,7 +38,7 @@ for Lab 1 of the Computational Process Organization course.
 - Initial project setup from course template
 - Added mutable unrolled linked list implementation
 - Added unit tests and property-based tests
-- Updated README
+- Updated full monoid PBT in test
 
 ## Design Note
 
