@@ -3,39 +3,42 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Iterator, Optional
+from typing import Callable, Generic, Iterator, Optional, TypeVar
+
+T = TypeVar("T")
+U = TypeVar("U")
 
 
 @dataclass
-class Node:
+class Node(Generic[T]):
     """Store a chunk of values inside the unrolled linked list."""
 
-    values: list[Any] = field(default_factory=list)
-    next: Optional["Node"] = None
-    prev: Optional["Node"] = None
+    values: list[T] = field(default_factory=list)
+    next: Optional["Node[T]"] = None
+    prev: Optional["Node[T]"] = None
 
 
-class UnrolledLinkedList:
+class UnrolledLinkedList(Generic[T]):
     """Mutable unrolled linked list implemented as a linked list of chunks."""
 
     def __init__(self, node_size: int = 4) -> None:
         self._validate_node_size(node_size)
         self.node_size = node_size
-        self.head: Optional[Node] = None
-        self.tail: Optional[Node] = None
+        self.head: Optional[Node[T]] = None
+        self.tail: Optional[Node[T]] = None
         self._length = 0
-        self._iter_node: Optional[Node] = None
+        self._iter_node: Optional[Node[T]] = None
         self._iter_index = 0
 
     @classmethod
-    def empty(cls, node_size: int = 4) -> "UnrolledLinkedList":
+    def empty(cls, node_size: int = 4) -> "UnrolledLinkedList[T]":
         """Create an empty list."""
         return cls(node_size=node_size)
 
-    def add(self, value: Any) -> None:
+    def add(self, value: T) -> None:
         """Add a new element to the tail of the structure."""
         if self.tail is None:
-            node = Node(values=[value])
+            node = Node[T](values=[value])
             self.head = node
             self.tail = node
             self._length = 1
@@ -46,17 +49,17 @@ class UnrolledLinkedList:
             self._length += 1
             return
 
-        node = Node(values=[value], prev=self.tail)
+        node = Node[T](values=[value], prev=self.tail)
         self.tail.next = node
         self.tail = node
         self._length += 1
 
-    def get(self, index: int) -> Any:
+    def get(self, index: int) -> T:
         """Get a value by index."""
         node, offset = self._locate(index)
         return node.values[offset]
 
-    def set(self, index: int, value: Any) -> None:
+    def set(self, index: int, value: T) -> None:
         """Set a value by index."""
         node, offset = self._locate(index)
         node.values[offset] = value
@@ -74,7 +77,7 @@ class UnrolledLinkedList:
         """Return the number of stored elements."""
         return self._length
 
-    def member(self, value: Any) -> bool:
+    def member(self, value: T) -> bool:
         """Check whether the value is stored in the structure."""
         current = self.head
 
@@ -91,7 +94,7 @@ class UnrolledLinkedList:
         values.reverse()
         self.from_list(values)
 
-    def from_list(self, values: list[Any]) -> None:
+    def from_list(self, values: list[T]) -> None:
         """Replace the current structure with values from a Python list."""
         self.head = None
         self.tail = None
@@ -100,9 +103,9 @@ class UnrolledLinkedList:
         for value in values:
             self.add(value)
 
-    def to_list(self) -> list[Any]:
+    def to_list(self) -> list[T]:
         """Convert the structure to a Python list."""
-        result: list[Any] = []
+        result: list[T] = []
         current = self.head
 
         while current is not None:
@@ -111,14 +114,14 @@ class UnrolledLinkedList:
 
         return result
 
-    def filter(self, predicate: Callable[[Any], bool]) -> None:
+    def filter(self, predicate: Callable[[T], bool]) -> None:
         """Keep only values that satisfy the predicate."""
         filtered_values = [
             value for value in self.to_list() if predicate(value)
         ]
         self.from_list(filtered_values)
 
-    def map(self, function: Callable[[Any], Any]) -> None:
+    def map(self, function: Callable[[T], T]) -> None:
         """Apply a function to every value in place."""
         current = self.head
 
@@ -128,10 +131,10 @@ class UnrolledLinkedList:
             current = current.next
 
     def reduce(
-            self,
-            function: Callable[[Any, Any], Any],
-            initial_state: Any,
-    ) -> Any:
+        self,
+        function: Callable[[U, T], U],
+        initial_state: U,
+    ) -> U:
         """Reduce all values into a single result."""
         result = initial_state
         current = self.head
@@ -143,7 +146,7 @@ class UnrolledLinkedList:
 
         return result
 
-    def concat(self, other: "UnrolledLinkedList") -> None:
+    def concat(self, other: "UnrolledLinkedList[T]") -> None:
         """Append elements from another list in place."""
         if not isinstance(other, UnrolledLinkedList):
             raise TypeError("other must be an UnrolledLinkedList")
@@ -152,13 +155,13 @@ class UnrolledLinkedList:
         for value in snapshot:
             self.add(value)
 
-    def __iter__(self) -> Iterator[Any]:
+    def __iter__(self) -> Iterator[T]:
         """Return the iterator object."""
         self._iter_node = self.head
         self._iter_index = 0
         return self
 
-    def __next__(self) -> Any:
+    def __next__(self) -> T:
         """Return the next element from the iterator."""
         while self._iter_node is not None:
             if self._iter_index < len(self._iter_node.values):
@@ -188,7 +191,7 @@ class UnrolledLinkedList:
         if node_size <= 0:
             raise ValueError("node_size must be greater than zero")
 
-    def _locate(self, index: int) -> tuple[Node, int]:
+    def _locate(self, index: int) -> tuple[Node[T], int]:
         if not isinstance(index, int):
             raise TypeError("index must be an integer")
         if index < 0 or index >= self._length:
@@ -205,7 +208,7 @@ class UnrolledLinkedList:
 
         raise IndexError("index out of range")
 
-    def _unlink_node(self, node: Node) -> None:
+    def _unlink_node(self, node: Node[T]) -> None:
         if node.prev is None:
             self.head = node.next
         else:

@@ -1,19 +1,25 @@
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
+from typing import Iterator, TypeVar
 
 from unrolled_linked_list import UnrolledLinkedList
 
+T = TypeVar("T")
 
-def build_list(values: list[int | None], node_size: int = 2) -> UnrolledLinkedList:
+
+def build_list(
+    values: list[T],
+    node_size: int = 2,
+) -> UnrolledLinkedList[T]:
     """Create a list from Python values for testing."""
-    lst = UnrolledLinkedList(node_size=node_size)
+    lst: UnrolledLinkedList[T] = UnrolledLinkedList(node_size=node_size)
     lst.from_list(values)
     return lst
 
 
 def test_empty() -> None:
-    lst = UnrolledLinkedList.empty()
+    lst: UnrolledLinkedList[int | None] = UnrolledLinkedList.empty()
     assert lst.to_list() == []
     assert lst.size() == 0
     assert str(lst) == "[]"
@@ -39,7 +45,10 @@ def test_size() -> None:
 def test_to_list() -> None:
     assert UnrolledLinkedList().to_list() == []
     assert build_list([1]).to_list() == [1]
-    assert build_list([None, 1, None], node_size=2).to_list() == [None, 1, None]
+    assert build_list(
+        [None, 1, None],
+        node_size=2,
+    ).to_list() == [None, 1, None]
 
 
 def test_from_list() -> None:
@@ -51,13 +60,15 @@ def test_from_list() -> None:
     ]
 
     for values in test_data:
-        lst = UnrolledLinkedList(node_size=2)
+        lst: UnrolledLinkedList[int | None] = UnrolledLinkedList(
+            node_size=2
+        )
         lst.from_list(values)
         assert lst.to_list() == values
 
 
 def test_add() -> None:
-    lst = UnrolledLinkedList(node_size=2)
+    lst: UnrolledLinkedList[int] = UnrolledLinkedList(node_size=2)
     assert lst.to_list() == []
 
     lst.add(1)
@@ -132,7 +143,7 @@ def test_remove_unlinks_empty_node() -> None:
 
 
 def test_member() -> None:
-    empty = UnrolledLinkedList()
+    empty: UnrolledLinkedList[int | None] = UnrolledLinkedList()
     lst = build_list([None, 1], node_size=2)
 
     assert not empty.member(None)
@@ -200,13 +211,14 @@ def test_iter() -> None:
 
     assert result == [None, 1, 2]
 
-    iterator = iter(UnrolledLinkedList())
+    empty_list: UnrolledLinkedList[int | None] = UnrolledLinkedList()
+    iterator: Iterator[int | None] = iter(empty_list)
     with pytest.raises(StopIteration):
         next(iterator)
 
 
 def test_eq_and_str() -> None:
-    empty = UnrolledLinkedList()
+    empty: UnrolledLinkedList[int | None] = UnrolledLinkedList()
     l1 = build_list([None, 1], node_size=2)
     l2 = build_list([None, 1], node_size=3)
 
@@ -219,7 +231,7 @@ def test_eq_and_str() -> None:
 
 @given(st.lists(st.one_of(st.none(), st.integers())))
 def test_from_list_to_list_equality(values: list[int | None]) -> None:
-    lst = UnrolledLinkedList(node_size=3)
+    lst: UnrolledLinkedList[int | None] = UnrolledLinkedList(node_size=3)
     lst.from_list(values)
 
     assert lst.to_list() == values
@@ -227,7 +239,7 @@ def test_from_list_to_list_equality(values: list[int | None]) -> None:
 
 @given(st.lists(st.one_of(st.none(), st.integers())))
 def test_python_len_and_list_size_equality(values: list[int | None]) -> None:
-    lst = UnrolledLinkedList(node_size=4)
+    lst: UnrolledLinkedList[int | None] = UnrolledLinkedList(node_size=4)
     lst.from_list(values)
 
     assert lst.size() == len(values)
@@ -235,7 +247,7 @@ def test_python_len_and_list_size_equality(values: list[int | None]) -> None:
 
 @given(st.lists(st.one_of(st.none(), st.integers())))
 def test_reverse_twice_restores_original(values: list[int | None]) -> None:
-    lst = UnrolledLinkedList(node_size=3)
+    lst: UnrolledLinkedList[int | None] = UnrolledLinkedList(node_size=3)
     lst.from_list(values)
 
     lst.reverse()
@@ -246,8 +258,10 @@ def test_reverse_twice_restores_original(values: list[int | None]) -> None:
 
 @given(st.lists(st.one_of(st.none(), st.integers())))
 def test_concat_right_identity(values: list[int | None]) -> None:
-    lst = UnrolledLinkedList(node_size=2)
-    empty = UnrolledLinkedList.empty(node_size=5)
+    lst: UnrolledLinkedList[int | None] = UnrolledLinkedList(node_size=2)
+    empty: UnrolledLinkedList[int | None] = UnrolledLinkedList.empty(
+        node_size=5
+    )
 
     lst.from_list(values)
     lst.concat(empty)
@@ -257,8 +271,10 @@ def test_concat_right_identity(values: list[int | None]) -> None:
 
 @given(st.lists(st.one_of(st.none(), st.integers())))
 def test_concat_left_identity(values: list[int | None]) -> None:
-    empty = UnrolledLinkedList.empty(node_size=2)
-    lst = UnrolledLinkedList(node_size=5)
+    empty: UnrolledLinkedList[int | None] = UnrolledLinkedList.empty(
+        node_size=2
+    )
+    lst: UnrolledLinkedList[int | None] = UnrolledLinkedList(node_size=5)
 
     lst.from_list(values)
     empty.concat(lst)
@@ -277,12 +293,12 @@ def test_concat_associativity(
     values_b: list[int | None],
     values_c: list[int | None],
 ) -> None:
-    left = UnrolledLinkedList(node_size=2)
+    left: UnrolledLinkedList[int | None] = UnrolledLinkedList(node_size=2)
     left.from_list(values_a)
     left.concat(build_list(values_b, node_size=3))
     left.concat(build_list(values_c, node_size=4))
 
-    right = UnrolledLinkedList(node_size=2)
+    right: UnrolledLinkedList[int | None] = UnrolledLinkedList(node_size=2)
     right.from_list(values_a)
     middle = build_list(values_b, node_size=3)
     middle.concat(build_list(values_c, node_size=4))
