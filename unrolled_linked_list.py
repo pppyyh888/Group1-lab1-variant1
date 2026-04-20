@@ -176,10 +176,36 @@ class UnrolledLinkedList(Generic[T]):
 
     def __eq__(self, other: object) -> bool:
         """Check structural equality."""
+        if self is other:
+            return True
+
         if not isinstance(other, UnrolledLinkedList):
             return False
 
-        return self.to_list() == other.to_list()
+        if self._length != other._length:
+            return False
+
+        left_node = self.head
+        right_node = other.head
+        left_index = 0
+        right_index = 0
+
+        while left_node is not None and right_node is not None:
+            if left_node.values[left_index] != right_node.values[right_index]:
+                return False
+
+            left_index += 1
+            right_index += 1
+
+            if left_index == len(left_node.values):
+                left_node = left_node.next
+                left_index = 0
+
+            if right_index == len(right_node.values):
+                right_node = right_node.next
+                right_index = 0
+
+        return left_node is None and right_node is None
 
     def __str__(self) -> str:
         """Return a string representation."""
