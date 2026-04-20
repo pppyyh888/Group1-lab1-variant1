@@ -40,6 +40,8 @@ for Lab 1 of the Computational Process Organization course.
 - Added unit tests and property-based tests
 - Updated full monoid PBT in test
 - Change element in the list from Any to Generic
+- ``eq`` function modified, directly check equality using the linked list, not using to list
+- Added test for testing different type of elements
 
 ## Design Note
 
@@ -50,8 +52,6 @@ The internal representation is a linked list of nodes. Each node stores a
 chunk of elements in a Python built-in list.
 
 The node size is configurable through the constructor.
-
-This implementation supports `None` as a valid stored value.
 
 Index-based operations are implemented for `get` and `set`. In this
 implementation, `remove` deletes an element by index.
