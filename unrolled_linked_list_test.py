@@ -152,6 +152,17 @@ def test_member() -> None:
     assert not lst.member(2)
 
 
+def test_mixed_types() -> None:
+    lst = build_list([1, "a", None, 3.14], node_size=2)
+
+    assert lst.to_list() == [1, "a", None, 3.14]
+    assert lst.member("a")
+    assert lst.get(2) is None
+
+    lst.set(1, "b")
+    assert lst.to_list() == [1, "b", None, 3.14]
+
+
 def test_reverse() -> None:
     lst = build_list([None, 1, 2, 3], node_size=2)
 
