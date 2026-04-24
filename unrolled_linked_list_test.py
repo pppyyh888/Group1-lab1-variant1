@@ -34,7 +34,6 @@ def build_list(
     return lst
 
 
-
 def unrolled_lists(
     node_size: int = 2,
 ) -> st.SearchStrategy[UnrolledLinkedList[int | None]]:
@@ -42,7 +41,6 @@ def unrolled_lists(
     return st.sampled_from(PRESET_ARRAYS).map(
         lambda values: build_list(values, node_size=node_size)
     )
-
 
 
 def clone_list(
@@ -53,13 +51,11 @@ def clone_list(
     return build_list(lst.to_list(), node_size=node_size)
 
 
-
 def test_empty() -> None:
     lst: UnrolledLinkedList[int | None] = UnrolledLinkedList.empty()
     assert lst == build_list([], node_size=4)
     assert lst.size() == 0
     assert str(lst) == "[]"
-
 
 
 def test_invalid_node_size() -> None:
@@ -73,12 +69,10 @@ def test_invalid_node_size() -> None:
         UnrolledLinkedList(1.5)  # type: ignore[arg-type]
 
 
-
 def test_size() -> None:
     assert UnrolledLinkedList().size() == 0
     assert build_list([1]).size() == 1
     assert build_list([1, 2, 3], node_size=2).size() == 3
-
 
 
 def test_to_list() -> None:
@@ -88,7 +82,6 @@ def test_to_list() -> None:
         [None, 1, None],
         node_size=2,
     ).to_list() == [None, 1, None]
-
 
 
 def test_from_list() -> None:
@@ -107,7 +100,6 @@ def test_from_list() -> None:
         assert lst == build_list(values, node_size=5)
 
 
-
 def test_add() -> None:
     lst: UnrolledLinkedList[int] = UnrolledLinkedList(node_size=2)
     assert lst == build_list([], node_size=3)
@@ -120,14 +112,12 @@ def test_add() -> None:
     assert lst == build_list([1, 2, 3], node_size=4)
 
 
-
 def test_get() -> None:
     lst = build_list([10, 20, 30, 40, 50], node_size=2)
 
     assert lst.get(0) == 10
     assert lst.get(2) == 30
     assert lst.get(4) == 50
-
 
 
 def test_set() -> None:
@@ -138,7 +128,6 @@ def test_set() -> None:
     assert lst == build_list([10, 20, 30, 99, 50], node_size=3)
 
 
-
 def test_remove() -> None:
     lst = build_list([10, 20, 30, 40, 50], node_size=2)
 
@@ -147,7 +136,6 @@ def test_remove() -> None:
 
     lst.remove(2)
     assert lst == build_list([10, 30, 50], node_size=4)
-
 
 
 def test_get_set_remove_index_errors() -> None:
@@ -169,7 +157,6 @@ def test_get_set_remove_index_errors() -> None:
         lst.get("1")  # type: ignore[arg-type]
 
 
-
 def test_remove_unlinks_empty_node() -> None:
     lst = build_list([1, 2, 3], node_size=1)
 
@@ -188,7 +175,6 @@ def test_remove_unlinks_empty_node() -> None:
     assert lst.tail is None
 
 
-
 def test_member() -> None:
     empty: UnrolledLinkedList[int | None] = UnrolledLinkedList()
     lst = build_list([None, 1], node_size=2)
@@ -197,7 +183,6 @@ def test_member() -> None:
     assert lst.member(None)
     assert lst.member(1)
     assert not lst.member(2)
-
 
 
 def test_mixed_types() -> None:
@@ -211,14 +196,12 @@ def test_mixed_types() -> None:
     assert lst.to_list() == [1, "b", None, 3.14]
 
 
-
 def test_reverse() -> None:
     lst = build_list([None, 1, 2, 3], node_size=2)
 
     lst.reverse()
 
     assert lst == build_list([3, 2, 1, None], node_size=3)
-
 
 
 def test_map() -> None:
@@ -229,7 +212,6 @@ def test_map() -> None:
     assert lst == build_list([2, 4, 6, 8], node_size=3)
 
 
-
 def test_filter() -> None:
     lst = build_list([1, 2, 3, 4], node_size=2)
 
@@ -238,14 +220,12 @@ def test_filter() -> None:
     assert lst == build_list([2, 4], node_size=3)
 
 
-
 def test_reduce() -> None:
     lst = build_list([1, 2, 3, 4], node_size=2)
 
     result = lst.reduce(lambda acc, x: acc + x, 0)
 
     assert result == 10
-
 
 
 def test_concat() -> None:
@@ -258,14 +238,12 @@ def test_concat() -> None:
     assert right == build_list([1, None], node_size=2)
 
 
-
 def test_concat_with_self() -> None:
     lst = build_list([1, 2, 3], node_size=2)
 
     lst.concat(lst)
 
     assert lst == build_list([1, 2, 3, 1, 2, 3], node_size=4)
-
 
 
 def test_iter() -> None:
@@ -281,7 +259,6 @@ def test_iter() -> None:
     iterator: Iterator[int | None] = iter(empty_list)
     with pytest.raises(StopIteration):
         next(iterator)
-
 
 
 def test_eq_and_str() -> None:
