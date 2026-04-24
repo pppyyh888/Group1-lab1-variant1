@@ -32,6 +32,8 @@ for Lab 1 of the Computational Process Organization course.
 - Equality and string representation
 - Unit tests
 - Property-based tests with Hypothesis
+- Use `__eq__` in test
+- Use default list
 
 ## Changelog
 
